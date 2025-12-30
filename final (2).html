@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ORÁCULO DA VERDADE</title>
+
+<style>
+:root{
+    --mystic:#d40000; /* Vermelho mais profundo e fechado */
+    --gold:#c5a059;   /* Cor de carta de tarot */
+    --dark:#000000;
+    --card:#0a0a0a;
+    --border:#1a1a1a;
+    --text:#ffffff;
+}
+
+body{ background:var(--dark); color:var(--text); font-family:'Georgia', serif; margin:0; padding:12px; display:flex; flex-direction:column; align-items:center; }
+
+/* HEADER MÍSTICO */
+.header { margin-top: 20px; }
+.header h1{ font-size:1.6rem; font-weight:900; color:var(--gold); text-align:center; margin-bottom:0; letter-spacing: 2px; }
+.header p { text-align:center; font-size:0.75rem; color: #666; margin-top:5px; text-transform: uppercase; }
+
+.preview-container, .pix-box{ width:100%; max-width:420px; }
+
+/* ALERTA DE REVELAÇÃO */
+.msg-alerta{ 
+    background:rgba(212,0,0,0.1); 
+    border:1px solid var(--mystic); 
+    color:var(--mystic); 
+    font-weight:bold; 
+    font-size:0.85rem; 
+    padding:12px; 
+    border-radius:5px; 
+    text-align:center; 
+    margin: 20px 0;
+    text-transform: uppercase;
+}
+
+/* CARTAS / MENSAGENS */
+.card-borrado{ 
+    background:var(--card); 
+    border:1px solid var(--border);
+    border-top: 3px solid var(--gold);
+    padding:18px; 
+    border-radius:8px; 
+    margin-bottom:15px; 
+    font-size:1rem; 
+    filter:blur(2px); /* Borrado pra atiçar a curiosidade */
+    opacity:.7; 
+    position: relative;
+}
+.contato-name{ color:var(--gold); font-weight:bold; font-size:0.8rem; display:block; margin-bottom:8px; text-transform: uppercase; }
+.censura{ background:#111; color:transparent; padding:0 4px; border-radius:2px; filter:blur(10px); }
+
+/* BOX DE PAGAMENTO (O SACRIFÍCIO) */
+.pix-box{ 
+    background:#050505; 
+    border:1px solid var(--gold); 
+    border-radius:15px; 
+    padding:25px; 
+    text-align:center; 
+    margin-top:20px;
+    box-shadow: 0 0 20px rgba(197, 160, 89, 0.1);
+}
+.preco-tag { font-size: 2.5rem; font-weight: 900; color: var(--gold); margin: 5px 0; }
+.preco-tag span { font-size: 1.2rem; color: #fff; vertical-align: middle; margin-right: 5px; }
+
+.pix-box h2{ font-size:1.1rem; font-weight:bold; margin-bottom:15px; color: #fff; line-height: 1.3;}
+
+.qr-placeholder{ width:160px; height:160px; background:#fff; border-radius:10px; margin:20px auto; display:flex; justify-content:center; align-items:center; padding: 10px; }
+.pix-code{ background:#000; border:1px dashed var(--gold); padding:15px; font-family:monospace; font-size:0.75rem; color:var(--gold); word-break:break-all; border-radius:5px; margin-bottom:20px; }
+
+.btn-copy{ 
+    width:100%; padding:22px; 
+    background:var(--mystic); 
+    color:#fff; border:none; border-radius:8px; font-weight:900; font-size:1.1rem; 
+    text-transform:uppercase; cursor:pointer; 
+}
+.btn-copy.success { background: #28a745 !important; }
+
+.timer{ color:var(--mystic); font-weight:bold; }
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>ORÁCULO DA VERDADE</h1>
+    <p>A revelação final está pronta</p>
+</div>
+
+<div class="preview-container">
+    <div class="msg-alerta">✨ O DESTINO REVELOU 3 SEGREDOS OCULTOS</div>
+
+    <div class="card-borrado">
+        <span class="contato-name" id="nome-contato">Consultando Energias...</span>
+        <span id="texto-mensagem">Abrindo caminhos...</span>
+    </div>
+
+    <div class="card-borrado">
+        <span class="contato-name">CONVERSA APAGADA · QUINTA-FEIRA</span>
+        "Não esquece de apagar <span class="censura">as fotos que te mandei agora</span> antes dela te ver."
+    </div>
+
+    <div class="card-borrado">
+        <span class="contato-name">LOCALIZAÇÃO · ÚLTIMAS 24H</span>
+        Parada detectada por 1h 45min em: <span class="censura">Rua das Flores, 450 - Suíte 12</span>
+    </div>
+</div>
+
+<div class="pix-box">
+    <p style="font-size:0.9rem; color:var(--gold); margin-bottom:10px; font-weight:bold;">REVELAÇÃO COMPLETA:</p>
+    <div class="preco-tag"><span>R$</span> 27,90</div>
+    <h2>Para liberar o acesso total ao que as cartas revelaram</h2>
+    
+    <p style="font-size:0.8rem; color:#888; margin-bottom:15px;">
+        Esta oportunidade se encerra em <span class="timer" id="time">05:00</span>
+    </p>
+
+    <div class="qr-placeholder">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=SEU_PIX_AQUI" width="150">
+    </div>
+
+    <div class="pix-code" id="pixKey">95a695a60332-ee2f-4252-8ba7-76162b4eec3e</div>
+
+    <button class="btn-copy" id="btnCopy" onclick="copy()">CONFIRMAR REVELAÇÃO</button>
+
+    <p style="font-size:0.7rem; color:#555; margin-top:20px; font-style: italic;">
+        A verdade será liberada imediatamente após o reconhecimento.
+    </p>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    let vinculo = localStorage.getItem('vinculoAlvo');
+    const nome = document.getElementById('nome-contato');
+    const texto = document.getElementById('texto-mensagem');
+
+    if (vinculo && vinculo.toLowerCase() === 'esposa') {
+        nome.innerText = 'CONVERSA COM "RICARDINHO"';
+        texto.innerHTML = '"Tá fazendo programa ainda? vem aqui <span class="censura">Tô com muita saudade</span> "';
+    } else {
+        nome.innerText = 'CONVERSA COM "AMANTE"';
+        texto.innerHTML = '"ontem foi <span class="censura">gostoso</span> ela já saiu? To no <span class="censura"> Motel te esperando </span> para finalizar."';
+    }
+});
+
+function copy() {
+    const textToCopy = document.getElementById("pixKey").innerText;
+    const btn = document.getElementById("btnCopy");
+    const textArea = document.createElement("textarea");
+    textArea.value = textToCopy;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+
+    const originalText = btn.innerText;
+    btn.innerText = "✓ CÓDIGO COPIADO!";
+    btn.classList.add("success");
+    setTimeout(() => {
+        btn.innerText = originalText;
+        btn.classList.remove("success");
+    }, 2000);
+}
+
+let t = 300;
+setInterval(() => {
+    let m = Math.floor(t/60);
+    let s = t%60;
+    document.getElementById('time').innerHTML = `0${m}:${s<10?'0'+s:s}`;
+    if(t>0) t--;
+}, 1000);
+</script>
+
+</body>
+</html>
